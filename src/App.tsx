@@ -1,5 +1,6 @@
 import React from 'react';
 import Editor, { OnMount, Monaco } from "@monaco-editor/react";
+import { getDiagnostics, RAW_MATHLINGUA_SYNTAX } from './Syntax';
 
 export function App() {
 
@@ -28,12 +29,23 @@ export function App() {
 function registerCompletionProvider(monaco: any) {
   monaco.languages.registerCompletionItemProvider('yaml', {
     provideCompletionItems: (model: any, position: any, token: any) => {
+      const line = model.getLineContent(position.lineNumber);
+      const indent =
+        line.length > 0 && (line[0] === " " || line[0] === ".") ? "  " : "";
+      const result = [];
+      for (const item of RAW_MATHLINGUA_SYNTAX.map(it => it.replace("[]\n", "").split("\n"))) {
+        for (let i = 0; i < item.length; i++) {
+          const parts = item.slice(i);
+          result.push({
+            label: parts[0] + "...",
+            kind: monaco.languages.CompletionItemKind.Text,
+            insertText: parts.join("\n" + indent).trim()
+          });
+        }
+      }
+
       return {
-        suggestions: [{
-          label: 'some-label',
-          kind: monaco.languages.CompletionItemKind.Text,
-          insertText: 'some-text',
-        }]
+        suggestions: result
       };
     }
   });
@@ -43,15 +55,8 @@ function registerValidator(monaco: any) {
   const models = monaco.editor.getModels();
   for (const model of models) {
     const validate = () => {
-      const markers = [{
-        severity: monaco.MarkerSeverity.Error,
-        startLineNumber: 0,
-        endLineNumber: 0,
-        startColumn: 0,
-        endColumn: 1,
-        message: 'text-error-message',
-      }];
-      monaco.editor.setModelMarkers(model, 'yaml', markers);
+      const markers = getDiagnostics(model.getValue());
+      monaco.editor.setModelMarkers(model, "yaml", markers);
     };
 
     let handle: NodeJS.Timeout | null = null;
