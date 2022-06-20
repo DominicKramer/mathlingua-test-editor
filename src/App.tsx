@@ -1,6 +1,7 @@
 import React from 'react';
 import Editor, { OnMount, Monaco } from "@monaco-editor/react";
-import { getDiagnostics, RAW_MATHLINGUA_SYNTAX } from './Syntax';
+import { RAW_MATHLINGUA_SYNTAX } from './Syntax';
+import { getDiagnostics } from './Analyzer';
 
 export function App() {
 
