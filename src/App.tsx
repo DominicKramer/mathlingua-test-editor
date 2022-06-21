@@ -3,6 +3,8 @@ import Editor, { OnMount } from "@monaco-editor/react";
 import { SYNTAX_GROUPS } from './Syntax';
 import { getDiagnostics, getLineInfo } from './Analyzer';
 
+const MATHLINGUA_KEY = 'MATHLINGUA_EDITOR';
+
 export function App() {
   const onMount: OnMount = (editor, monaco: any) => {
     configureEditor(monaco);
@@ -26,7 +28,7 @@ export function App() {
           },
           renderIndentGuides: false
        }}
-       value={''}
+       value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
        onMount={onMount}
      />
   );
@@ -151,7 +153,9 @@ function registerValidator(monaco: any) {
   const models = monaco.editor.getModels();
   for (const model of models) {
     const validate = () => {
-      const markers = getDiagnostics(model.getValue());
+      const val = model.getValue();
+      localStorage.setItem(MATHLINGUA_KEY, val);
+      const markers = getDiagnostics(val);
       monaco.editor.setModelMarkers(model, "yaml", markers);
     };
 
