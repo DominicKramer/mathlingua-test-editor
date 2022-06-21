@@ -137,7 +137,10 @@ function toLines(text: string): Line[] {
 function toGroups(items: Line[]): Group[] {
   const result: Group[] = [];
   const stack: Array<Line[]> = [];
-  for (const item of items) {
+  // filter out [...] lines since the grouping mechanism doesn't know
+  // how to handle them, and the consequence is that using [...] is
+  // incorrectly marked as an error
+  for (const item of items.filter(line => line.content.indexOf('[') === -1)) {
     if (item === null) {
       while (stack.length > 0) {
         result.push({
