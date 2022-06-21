@@ -91,6 +91,27 @@ interface Line {
   hasDot: boolean;
 }
 
+export function getLineInfo(content: string): { hasDot: boolean; indent: number; name: string; } {
+  let hasDot = false;
+  let indent = 0;
+  let name = '';
+
+  let j = 0;
+  while (j < content.length && (content[j] === ' ' || content[j] === '.')) {
+    indent++;
+    if (content[j] === '.') {
+      hasDot = true;
+    }
+    j++;
+  }
+
+  while (j < content.length && content[j] !== ':') {
+    name += content[j++];
+  }
+
+  return { hasDot, indent, name };
+}
+
 function toLines(text: string): Line[] {
   const result: Line[] = [];
   const tokens = tokenize(text).filter(token => token.type === TokenType.Other);
@@ -101,24 +122,7 @@ function toLines(text: string): Line[] {
     while (i < tokens.length && tokens[i].lineNumber === lineNumber) {
       content += tokens[i++].text;
     }
-
-    let hasDot = false;
-    let indent = 0;
-    let name = '';
-
-    let j = 0;
-    while (j < content.length && (content[j] === ' ' || content[j] === '.')) {
-      indent++;
-      if (content[j] === '.') {
-        hasDot = true;
-      }
-      j++;
-    }
-
-    while (j < content.length && content[j] !== ':') {
-      name += content[j++];
-    }
-
+    const { indent, name, hasDot } = getLineInfo(content);
     result.push({
       lineNumber,
       content,

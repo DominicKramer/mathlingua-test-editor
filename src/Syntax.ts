@@ -57,3 +57,5 @@ export function createSyntaxMap(syntaxList: string[]): Map<string, string[]> {
   }
   return result;
 }
+
+export const SYNTAX_GROUPS: Array<string[]> = RAW_MATHLINGUA_SYNTAX.map(it => it.replace("[]\n", "").split("\n"))
