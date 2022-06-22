@@ -1,5 +1,5 @@
 
-export const RAW_MATHLINGUA_SYNTAX = [
+const DEFAULT_RAW_MATHLINGUA_SYNTAX = [
   "and:",
   "not:",
   "or:",
@@ -18,7 +18,7 @@ export const RAW_MATHLINGUA_SYNTAX = [
   "memberSymbols:\nwhere:",
   "symbols:\nas:",
   "memberSymbols:\nas:",
-  "[]\nDefines:\nwith?:\ngiven?:\nwhen?:\nsuchThat?:\nmeans?:\nsatisfying?:\nexpressing?:\nusing?:\nProviding?:\nCodified:\nDescribed?:\nMetadata?:",
+  "[]\nDefines:\nwith?:\ngiven?:\nwhen?:\nsuchThat?:\nextends?:\nsatisfying?:\nmeans?:\nexpressing?:\nusing?:\nProviding?:\nCodified:\nDescribed?:\nMetadata?:",
   "note:",
   "tag:",
   "reference:",
@@ -49,6 +49,42 @@ export const RAW_MATHLINGUA_SYNTAX = [
   "generally:\nas?:\nnote?:"
 ];
 
+const SYNTAX_KEY = 'MATHLINGUA_SYNTAX';
+
+/*
+function parseSyntaxText(text: string): string[] {
+  const lines = text.split('\n');
+  const result: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    let content = '';
+    while (i < lines.length && lines[i].replace(/ /g, '') !== '') {
+      content += lines[i];
+      i++;
+    }
+    result.push(content.trim());
+    while (i < lines.length && lines[i].replace(/ /g, '') === '') {
+      i++;
+    }
+  }
+  return result;
+}
+*/
+
+export function loadRawMathlinguaSyntax(): string[] {
+  /*
+  const fromStorage = localStorage.getItem(SYNTAX_KEY);
+  if (fromStorage) {
+    return fromStorage.split('\n');
+  }
+  */
+  return DEFAULT_RAW_MATHLINGUA_SYNTAX;
+}
+
+export function saveRawMathlinguaSyntax(syntax: string) {
+//  localStorage.setItem(SYNTAX_KEY, syntax);
+}
+
 export function createSyntaxMap(syntaxList: string[]): Map<string, string[]> {
   const result = new Map<string, string[]>();
   for (const item of syntaxList) {
@@ -58,4 +94,6 @@ export function createSyntaxMap(syntaxList: string[]): Map<string, string[]> {
   return result;
 }
 
-export const SYNTAX_GROUPS: Array<string[]> = RAW_MATHLINGUA_SYNTAX.map(it => it.replace("[]\n", "").split("\n"))
+export function loadSyntaxGroups(): Array<string[]> {
+  return loadRawMathlinguaSyntax().map(it => it.replace("[]\n", "").split("\n"));
+}
