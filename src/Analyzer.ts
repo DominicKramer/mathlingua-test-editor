@@ -1,5 +1,5 @@
 import { tokenize, TokenType } from "./Lexer";
-import { createSyntaxMap, RAW_MATHLINGUA_SYNTAX } from "./Syntax";
+import { createSyntaxMap, loadRawMathlinguaSyntax } from "./Syntax";
 
 export interface Diagnostic {
   startLineNumber: number;
@@ -15,7 +15,7 @@ export function getDiagnostics(text: string): Diagnostic[] {
   const groups = toGroups(lines);
   for (const actual of groups) {
     const headName = actual.lines[0].name;
-    const expected = createSyntaxMap(RAW_MATHLINGUA_SYNTAX).get(headName) || [];
+    const expected = createSyntaxMap(loadRawMathlinguaSyntax()).get(headName) || [];
 
     let i = 0;
     let j = 0;
