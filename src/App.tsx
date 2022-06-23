@@ -14,7 +14,7 @@ export function App() {
   const onMount: OnMount = (editor, monaco: any) => {
     configureEditor(monaco);
     registerCompletionProvider(monaco);
-    // registerValidator(monaco);
+    registerValidator(monaco);
   };
 
   const onMountSyntaxEditor: OnMount = (editor, monaco: any) => {
@@ -67,7 +67,7 @@ export function App() {
     <Tabs onSelect={(index) => setMessage('' + index)}>
       <TabList>
         <Tab>Content</Tab>
-        <Tab>Syntax:</Tab>
+        <Tab>Syntax</Tab>
       </TabList>
 
       <TabPanel>

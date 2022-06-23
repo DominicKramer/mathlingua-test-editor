@@ -5,6 +5,7 @@ export enum TokenType {
   DoubleQuote,
   Backtick,
   Newline,
+  LineBreak,
   Other
 }
 
@@ -22,7 +23,17 @@ export function tokenize(rawText: string): Token[] {
   while (i < text.length) {
     const startLine = lineNumber;
     const c = text[i++];
-    if (c === '\n') {
+    if (c === '\n' && i < text.length && text[i] === '\n') {
+      while (i < text.length && text[i] === '\n') {
+        i++;
+        lineNumber++;
+      }
+      result.push({
+        type: TokenType.LineBreak,
+        lineNumber: startLine,
+        text: ''
+      });
+    } else if (c === '\n') {
       lineNumber++;
       result.push({
         type: TokenType.Newline,

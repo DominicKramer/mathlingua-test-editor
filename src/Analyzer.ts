@@ -114,12 +114,24 @@ export function getLineInfo(content: string): { hasDot: boolean; indent: number;
 
 function toLines(text: string): Line[] {
   const result: Line[] = [];
-  const tokens = tokenize(text).filter(token => token.type === TokenType.Other);
+  const tokens = tokenize(text).filter(token => token.type === TokenType.Other || token.type === TokenType.LineBreak);
   let i = 0;
   while (i < tokens.length) {
+    if (tokens[i].type === TokenType.LineBreak) {
+      const lineNumber = tokens[i++].lineNumber;
+      result.push({
+        lineNumber,
+        content: '',
+        indent: 0,
+        name: '',
+        hasDot: false
+      });
+      continue;
+    }
+
     let content = '';
     let lineNumber = tokens[i]?.lineNumber ?? -1;
-    while (i < tokens.length && tokens[i].lineNumber === lineNumber) {
+    while (i < tokens.length && tokens[i].type === TokenType.Other && tokens[i].lineNumber === lineNumber) {
       content += tokens[i++].text;
     }
     const { indent, name, hasDot } = getLineInfo(content);
@@ -141,7 +153,8 @@ function toGroups(items: Line[]): Group[] {
   // how to handle them, and the consequence is that using [...] is
   // incorrectly marked as an error
   for (const item of items.filter(line => line.content.indexOf('[') === -1)) {
-    if (item === null) {
+    if (item.content === '') {
+      // the group is done
       while (stack.length > 0) {
         result.push({
           lines: stack.pop()!
