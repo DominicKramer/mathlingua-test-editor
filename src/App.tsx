@@ -14,7 +14,7 @@ export function App() {
   const onMount: OnMount = (editor, monaco: any) => {
     configureEditor(monaco);
     registerCompletionProvider(monaco);
-    registerValidator(monaco);
+    // registerValidator(monaco);
   };
 
   const onMountSyntaxEditor: OnMount = (editor, monaco: any) => {
