@@ -10,6 +10,32 @@ const MATHLINGUA_KEY = 'MATHLINGUA_EDITOR';
 
 export function App() {
   const [message, setMessage] = React.useState('');
+  const [doValidate, setDoValidate] = React.useState(false);
+
+  function registerValidator(monaco: any) {
+    const models = monaco.editor.getModels();
+    for (const model of models) {
+      const validate = () => {
+        if (!doValidate) {
+          return;
+        }
+
+        const val = model.getValue();
+        localStorage.setItem(MATHLINGUA_KEY, val);
+        const markers = getDiagnostics(val);
+        monaco.editor.setModelMarkers(model, "yaml", markers);
+      };
+  
+      let handle: NodeJS.Timeout | null = null;
+      model.onDidChangeContent(() => {
+        if (handle) {
+          clearTimeout(handle);
+        }
+        handle = setTimeout(validate, 500);
+      });
+      validate();
+    }
+  }
 
   const onMount: OnMount = (editor, monaco: any) => {
     configureEditor(monaco);
@@ -68,6 +94,7 @@ export function App() {
       <TabList>
         <Tab>Content</Tab>
         <Tab>Syntax</Tab>
+        <Tab>Settings</Tab>
       </TabList>
 
       <TabPanel>
@@ -75,6 +102,13 @@ export function App() {
       </TabPanel>
       <TabPanel>
         {syntaxEditor}
+      </TabPanel>
+      <TabPanel>
+        <button onClick={() => {
+          setDoValidate(true);
+        }}>
+          Enable checking
+        </button>
       </TabPanel>
     </Tabs>
     <span style={{ color: 'white' }}>{message}</span>
@@ -197,25 +231,4 @@ function registerCompletionProvider(monaco: any) {
       };
     }
   });
-}
-
-function registerValidator(monaco: any) {
-  const models = monaco.editor.getModels();
-  for (const model of models) {
-    const validate = () => {
-      const val = model.getValue();
-      localStorage.setItem(MATHLINGUA_KEY, val);
-      const markers = getDiagnostics(val);
-      monaco.editor.setModelMarkers(model, "yaml", markers);
-    };
-
-    let handle: NodeJS.Timeout | null = null;
-    model.onDidChangeContent(() => {
-      if (handle) {
-        clearTimeout(handle);
-      }
-      handle = setTimeout(validate, 500);
-    });
-    validate();
-  }
 }
