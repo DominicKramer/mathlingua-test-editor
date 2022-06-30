@@ -3,62 +3,108 @@ import Editor, { OnMount } from "@monaco-editor/react";
 
 const MATHLINGUA_KEY = 'MATHLINGUA_EDITOR';
 
+const ORANGE = '#ffaa00';
+const DARK_ORANGE = '#dd9900';
+
 export function App() {
+  const [rawFontSize, setRawFontSize] = React.useState(18);
+  const [light, setLight] = React.useState(true);
+  const [blur, setBlur] = React.useState(false);
+  const [useRetroFont, setUseRetroFont] = React.useState(false);
+
+  React.useEffect(() => {
+    document.body.style.backgroundColor = light ? '#fbfbfb' : '#000000'; 
+  }, [light]);
+
+  React.useEffect(() => {
+    document.body.style.textShadow = blur ? '1px 1px 6px' : 'none';
+  }, [blur]);
+
   const onMount: OnMount = (editor, monaco: any) => {
+    monaco.editor.defineTheme('customTheme', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [{
+        background: '#000000',
+        foreground: DARK_ORANGE,
+      }],
+      colors: {
+        'editor.foreground': ORANGE,
+        'editor.background': '#000000',
+      }
+    });
     configureEditor(monaco);
     registerCompletionProvider(monaco);
     registerSaver(monaco);
   };
 
-  const [fontSize, setFontSize] = React.useState(18);
-
+  const foreground = light ? '#555555' : ORANGE;
+  const fontSize = useRetroFont ? rawFontSize + 7 : rawFontSize;
+  const fontFamily = useRetroFont ? 'IBM_DOS_ISO9' : undefined;
+  const buttonStyle = {
+    border: 'none',
+    background: 'transparent',
+    color: foreground,
+    float: 'right',
+    marginRight: '1em',
+    fontSize,
+    fontFamily,
+  } as const;
   return <div style={{
-    width: '80%',
+    width: light ? '80%' : '99%',
     marginLeft: 'auto',
     marginRight: 'auto',
-    border: 'solid',
+    border: light ? 'solid' : 'none',
     borderWidth: '1px',
-    borderColor: '#eee',
+    borderColor: light ? '#eee' : '#000000',
     borderRadius: '2px',
-    boxShadow: '0 1px 5px rgba(0,0,0,.1)',
+    boxShadow: light ? '0 1px 5px rgba(0,0,0,.1)' : 'none',
     marginTop: '2vh',
     paddingTop: '0.25em',
     paddingLeft: '1ex',
-    backgroundColor: 'white',
+    backgroundColor: light ? 'white' : '#000000',
   }}>
     <div>
       <button
-        style={{
-          border: 'none',
-          background: 'transparent',
-          color: '#555555',
-          float: 'right',
-          marginRight: '1em',
-          fontSize,
-        }}
+        style={buttonStyle}
         onClick={() => {
-          setFontSize(fontSize + 1);
+          setRawFontSize(rawFontSize + 1);
         }}
       >
         +
       </button>
       <button
-        style={{
-          border: 'none',
-          background: 'transparent',
-          color: '#555555',
-          float: 'right',
-          marginRight: '1em',
-          fontSize,
-        }}
+        style={buttonStyle}
         onClick={() => {
-          setFontSize(Math.max(0, fontSize - 1));
+          setRawFontSize(Math.max(0, rawFontSize - 1));
         }}>
           -
-        </button>
+      </button>
+      <button
+        style={buttonStyle}
+        onClick={() => {
+          setLight(!light);
+        }}>
+          =
+      </button>
+      <button
+        style={buttonStyle}
+        onClick={() => {
+          setBlur(!blur);
+        }}>
+          #
+      </button>
+      <button
+        style={buttonStyle}
+        onClick={() => {
+          setUseRetroFont(!useRetroFont);
+        }}>
+          {useRetroFont ? '*' : '@'}
+      </button>
       <Editor
         height='92vh'
         defaultLanguage='yaml'
+        theme={light ? 'light' : 'customTheme'}
         options={{
           lineNumbers: 'off',
           autoClosingBrackets: 'never',
@@ -71,7 +117,8 @@ export function App() {
           },
           renderIndentGuides: false,
           renderLineHighlight: false,
-          fontSize
+          fontSize,
+          fontFamily,
         }}
         value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
         onMount={onMount}

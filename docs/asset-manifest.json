@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "./static/css/main.b52324bb.css",
-    "main.js": "./static/js/main.ecc5d941.js",
+    "main.css": "./static/css/main.e6920015.css",
+    "main.js": "./static/js/main.21e9c475.js",
+    "static/media/Ac437_IBM_DOS_ISO9.ttf": "./static/media/Ac437_IBM_DOS_ISO9.edf4dea43adab5243372.ttf",
     "index.html": "./index.html",
-    "main.b52324bb.css.map": "./static/css/main.b52324bb.css.map",
-    "main.ecc5d941.js.map": "./static/js/main.ecc5d941.js.map"
+    "main.e6920015.css.map": "./static/css/main.e6920015.css.map",
+    "main.21e9c475.js.map": "./static/js/main.21e9c475.js.map"
   },
   "entrypoints": [
-    "static/css/main.b52324bb.css",
-    "static/js/main.ecc5d941.js"
+    "static/css/main.e6920015.css",
+    "static/js/main.21e9c475.js"
   ]
 }
