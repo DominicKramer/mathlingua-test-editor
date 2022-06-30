@@ -1,85 +1,48 @@
 import React from 'react';
 import Editor, { OnMount } from "@monaco-editor/react";
-import { loadRawMathlinguaSyntax, loadSyntaxGroups, saveRawMathlinguaSyntax } from './Syntax';
-import { getDiagnostics, getLineInfo } from './Analyzer';
-
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
 
 const MATHLINGUA_KEY = 'MATHLINGUA_EDITOR';
 
 export function App() {
-  const [message, setMessage] = React.useState('');
-
   const onMount: OnMount = (editor, monaco: any) => {
     configureEditor(monaco);
     registerCompletionProvider(monaco);
-    registerValidator(monaco);
+    registerSaver(monaco);
   };
 
-  const onMountSyntaxEditor: OnMount = (editor, monaco: any) => {
-    const models = monaco.editor.getModels();
-    for (const model of models) {
-      const save = () => {
-        const val = model.getValue();
-        saveRawMathlinguaSyntax(val);
-      };
-
-      let handle: NodeJS.Timeout | null = null;
-      model.onDidChangeContent(() => {
-        if (handle) {
-          clearTimeout(handle);
-        }
-        handle = setTimeout(save, 500);
-      });
-      save();
-    }
-  };
-
-  const codeEditor = <Editor
-    height='100vh'
-    defaultLanguage='yaml'
-    options={{
-      lineNumbers: 'on',
-      autoClosingBrackets: 'never',
-      autoClosingQuotes: 'never',
-      tabSize: 2,
-      autoIndent: true,
-      quickSuggestions: false,
-      minimap: {
-        enabled: false
-      },
-      renderIndentGuides: false
-    }}
-    value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
-    onMount={onMount}
-  />;
-
-  const syntaxEditor = <Editor
-    height='100vh'
-    defaultLanguage='txt'
-    value={loadRawMathlinguaSyntax().map(it => it.replace(/\n/g, '\\n')).join('\n')}
-    onMount={onMountSyntaxEditor}
-  />;
-
-  return (
-    <>
-    <Tabs onSelect={(index) => setMessage('' + index)}>
-      <TabList>
-        <Tab>Content</Tab>
-        <Tab>Syntax</Tab>
-      </TabList>
-
-      <TabPanel>
-        {codeEditor}
-      </TabPanel>
-      <TabPanel>
-        {syntaxEditor}
-      </TabPanel>
-    </Tabs>
-    <span style={{ color: 'white' }}>{message}</span>
-    </>
-  );
+  return <div style={{
+    width: '80%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    border: 'solid',
+    borderWidth: '1px',
+    borderColor: '#eee',
+    borderRadius: '2px',
+    boxShadow: '0 1px 5px rgba(0,0,0,.1)',
+    marginTop: '2vh',
+    paddingLeft: '1.5ex',
+    backgroundColor: 'white',
+  }}>
+    <Editor
+      height='96vh'
+      defaultLanguage='yaml'
+      options={{
+        lineNumbers: 'off',
+        autoClosingBrackets: 'never',
+        autoClosingQuotes: 'never',
+        tabSize: 2,
+        autoIndent: true,
+        quickSuggestions: false,
+        minimap: {
+          enabled: false
+        },
+        renderIndentGuides: false,
+        renderLineHighlight: false,
+      }}
+      value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
+      onMount={onMount}
+    />
+  </div>;
 }
 
 function configureEditor(monaco: any) {
@@ -93,7 +56,7 @@ function configureEditor(monaco: any) {
 function registerCompletionProvider(monaco: any) {
   monaco.languages.registerCompletionItemProvider('yaml', {
     provideCompletionItems: (model: any, position: any, token: any) => {
-      const syntaxGroups = loadSyntaxGroups();
+      const syntaxGroups = SYNTAX_GROUPS;
 
       // get information about the current line where the
       // autocomplete was activated
@@ -199,14 +162,12 @@ function registerCompletionProvider(monaco: any) {
   });
 }
 
-function registerValidator(monaco: any) {
+function registerSaver(monaco: any) {
   const models = monaco.editor.getModels();
   for (const model of models) {
     const validate = () => {
       const val = model.getValue();
       localStorage.setItem(MATHLINGUA_KEY, val);
-      const markers = getDiagnostics(val);
-      monaco.editor.setModelMarkers(model, "yaml", markers);
     };
 
     let handle: NodeJS.Timeout | null = null;
@@ -219,3 +180,78 @@ function registerValidator(monaco: any) {
     validate();
   }
 }
+
+function getLineInfo(content: string): { hasDot: boolean; indent: number; name: string; } {
+  let hasDot = false;
+  let indent = 0;
+  let name = '';
+
+  let j = 0;
+  while (j < content.length && (content[j] === ' ' || content[j] === '.')) {
+    indent++;
+    if (content[j] === '.') {
+      hasDot = true;
+    }
+    j++;
+  }
+
+  while (j < content.length && content[j] !== ':') {
+    name += content[j++];
+  }
+
+  return { hasDot, indent, name };
+}
+
+const DEFAULT_RAW_MATHLINGUA_SYNTAX = [
+  "and:",
+  "not:",
+  "or:",
+  "exists:\nwhere?:\nsuchThat?:",
+  "existsUnique:\nwhere?:\nsuchThat?:",
+  "forAll:\nwhere?:\nsuchThat?:\nthen:",
+  "if:\nthen:",
+  "iff:\nthen:",
+  "generated:\nfrom:\nwhen?:",
+  "piecewise:\nwhen?:\nthen?:\nelse?:",
+  "matching:",
+  "equality:\nbetween:\nprovided:",
+  "member:\nmeans:",
+  "membership:\naxiomatically:",
+  "view:\nas:\nvia:\nby?:",
+  "symbols:\nwhere:",
+  "memberSymbols:\nwhere:",
+  "symbols:\nas:",
+  "memberSymbols:\nas:",
+  "[]\nDefines:\nwith?:\ngiven?:\nwhen?:\nsuchThat?:\nextends?:\nsatisfying?:\nmeans?:\nexpressing?:\nusing?:\nProviding?:\nCodified:\nDescribed?:\nMetadata?:",
+  "note:",
+  "tag:",
+  "reference:",
+  "[]\nStates:\ngiven?:\nwhen?:\nsuchThat?:\nthat:\nusing?:\nCodified:\nDescribed?:\nMetadata?:",
+  "writing:",
+  "written:",
+  "called:",
+  "type:",
+  "name:",
+  "author:",
+  "homepage:",
+  "url:",
+  "offset:",
+  "[]\nResource:",
+  "[]\nAxiom:\ngiven?:\nwhere?:\nsuchThat?:\nthen:\niff?:\nusing?:\nMetadata?:",
+  "[]\nConjecture:\ngiven?:\nwhere?:\nsuchThat?:\nthen:\niff?:\nusing?:\nMetadata?:",
+  "[]\nTheorem:\ngiven?:\nwhere?:\nsuchThat?:\nthen:\niff?:\nusing?:\nProof?:\nMetadata?:",
+  "[]\nTopic:\ncontent:\nMetadata?:",
+  "Note:\ncontent:\nMetadata?:",
+  "Specify:",
+  "zero:\nis:",
+  "positiveInt:\nis:",
+  "negativeInt:\nis:",
+  "positiveFloat:\nis:",
+  "negativeFloat:\nis:",
+  "informally:\nas?:\nnote?:",
+  "formally:\nas?:\nnote?:",
+  "generally:\nas?:\nnote?:"
+];
+
+export const SYNTAX_GROUPS =
+  DEFAULT_RAW_MATHLINGUA_SYNTAX.map(it => it.replace("[]\n", "").split("\n"));
