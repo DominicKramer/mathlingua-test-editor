@@ -20,11 +20,12 @@ export function App() {
     borderRadius: '2px',
     boxShadow: '0 1px 5px rgba(0,0,0,.1)',
     marginTop: '2vh',
-    paddingLeft: '1.5ex',
+    paddingTop: '1.75em',
+    paddingLeft: '1ex',
     backgroundColor: 'white',
   }}>
     <Editor
-      height='96vh'
+      height='92vh'
       defaultLanguage='yaml'
       options={{
         lineNumbers: 'off',
