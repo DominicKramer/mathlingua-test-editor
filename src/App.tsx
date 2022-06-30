@@ -10,6 +10,8 @@ export function App() {
     registerSaver(monaco);
   };
 
+  const [fontSize, setFontSize] = React.useState(18);
+
   return <div style={{
     width: '80%',
     marginLeft: 'auto',
@@ -20,29 +22,61 @@ export function App() {
     borderRadius: '2px',
     boxShadow: '0 1px 5px rgba(0,0,0,.1)',
     marginTop: '2vh',
-    paddingTop: '1.75em',
+    paddingTop: '0.25em',
     paddingLeft: '1ex',
     backgroundColor: 'white',
   }}>
-    <Editor
-      height='92vh'
-      defaultLanguage='yaml'
-      options={{
-        lineNumbers: 'off',
-        autoClosingBrackets: 'never',
-        autoClosingQuotes: 'never',
-        tabSize: 2,
-        autoIndent: true,
-        quickSuggestions: false,
-        minimap: {
-          enabled: false
-        },
-        renderIndentGuides: false,
-        renderLineHighlight: false,
-      }}
-      value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
-      onMount={onMount}
-    />
+    <div>
+      <button
+        style={{
+          border: 'none',
+          background: 'transparent',
+          color: '#555555',
+          float: 'right',
+          marginRight: '1em',
+          fontSize,
+        }}
+        onClick={() => {
+          setFontSize(fontSize + 1);
+        }}
+      >
+        +
+      </button>
+      <button
+        style={{
+          border: 'none',
+          background: 'transparent',
+          color: '#555555',
+          float: 'right',
+          marginRight: '1em',
+          fontSize,
+        }}
+        onClick={() => {
+          setFontSize(Math.max(0, fontSize - 1));
+        }}>
+          -
+        </button>
+      <Editor
+        height='92vh'
+        defaultLanguage='yaml'
+        options={{
+          lineNumbers: 'off',
+          autoClosingBrackets: 'never',
+          autoClosingQuotes: 'never',
+          tabSize: 2,
+          autoIndent: true,
+          quickSuggestions: false,
+          minimap: {
+            enabled: false
+          },
+          renderIndentGuides: false,
+          renderLineHighlight: false,
+          fontSize
+        }}
+        value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
+        onMount={onMount}
+      />
+    </div>
   </div>;
 }
 
