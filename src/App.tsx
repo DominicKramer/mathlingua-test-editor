@@ -9,15 +9,25 @@ const DARK_ORANGE = '#dd9900';
 export function App() {
   const [rawFontSize, setRawFontSize] = React.useState(18);
   const [light, setLight] = React.useState(true);
-  const [blur, setBlur] = React.useState(false);
-  const [useRetroFont, setUseRetroFont] = React.useState(false);
+  const [blur, setBlur] = React.useState(true);
+  const [useRetroFont, setUseRetroFont] = React.useState(true);
 
   React.useEffect(() => {
     document.body.style.backgroundColor = light ? '#fbfbfb' : '#000000'; 
   }, [light]);
 
+  const setShadow = (node: Node) => {
+    if ((node as any).style) {
+      const style = getComputedStyle(node as any);
+      (node as any).style.textShadow = `1px 1px 6px ${style.color}`;
+    }
+    node.childNodes.forEach(setShadow);
+  }
+
   React.useEffect(() => {
-    document.body.style.textShadow = blur ? '1px 1px 6px' : 'none';
+    setTimeout(() => {
+      setShadow(document.body);
+    }, 1000);
   }, [blur]);
 
   const onMount: OnMount = (editor, monaco: any) => {
@@ -31,11 +41,17 @@ export function App() {
       colors: {
         'editor.foreground': ORANGE,
         'editor.background': '#000000',
+        'editor.selectionBackground': '#222222',
+        'editor.selectionHighlightBackground': '#000000',
+        'editorCursor.foreground': '#663300',
       }
     });
     configureEditor(monaco);
     registerCompletionProvider(monaco);
     registerSaver(monaco);
+    // this is needed to initially use dark mode since the
+    // custom theme needs to be defined before dark mode can be used
+    setLight(false);
   };
 
   const foreground = light ? '#555555' : ORANGE;
@@ -117,11 +133,15 @@ export function App() {
           },
           renderIndentGuides: false,
           renderLineHighlight: false,
+          cursorStyle: 'block',
+          cursorBlinking: 'solid',
+          matchBrackets: 'never',
           fontSize,
           fontFamily,
         }}
         value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
         onMount={onMount}
+        onChange={() => setShadow(document.body)}
       />
     </div>
   </div>;
