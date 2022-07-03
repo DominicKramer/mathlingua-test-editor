@@ -6,11 +6,17 @@ const MATHLINGUA_KEY = 'MATHLINGUA_EDITOR';
 const ORANGE = '#ffaa00';
 const DARK_ORANGE = '#dd9900';
 
+const FONTS = [
+  'AcPlus_IBM_VGA_8x14',
+  'IBM_DOS_ISO9',
+  undefined,
+];
+
 export function App() {
   const [rawFontSize, setRawFontSize] = React.useState(18);
   const [light, setLight] = React.useState(true);
   const [blur, setBlur] = React.useState(true);
-  const [useRetroFont, setUseRetroFont] = React.useState(true);
+  const [fontIndex, setFontIndex] = React.useState(0);
 
   React.useEffect(() => {
     document.body.style.backgroundColor = light ? '#fbfbfb' : '#000000'; 
@@ -54,9 +60,10 @@ export function App() {
     setLight(false);
   };
 
+  const usingRetroFont = fontIndex === FONTS.length - 1;
   const foreground = light ? '#555555' : ORANGE;
-  const fontSize = useRetroFont ? rawFontSize + 7 : rawFontSize;
-  const fontFamily = useRetroFont ? 'IBM_DOS_ISO9' : undefined;
+  const fontSize = usingRetroFont ? rawFontSize + 7 : rawFontSize;
+  const fontFamily = FONTS[fontIndex];
   const buttonStyle = {
     border: 'none',
     background: 'transparent',
@@ -113,9 +120,9 @@ export function App() {
       <button
         style={buttonStyle}
         onClick={() => {
-          setUseRetroFont(!useRetroFont);
+          setFontIndex((fontIndex + 1) % FONTS.length);
         }}>
-          {useRetroFont ? '*' : '@'}
+          {usingRetroFont ? '*' : '@'}
       </button>
       <Editor
         height='92vh'

@@ -4,6 +4,11 @@
   src: local('IBM_DOS_ISO9'), url(./fonts/Ac437_IBM_DOS_ISO9.ttf) format('truetype');
 }
 
+@font-face {
+  font-family: 'AcPlus_IBM_VGA_8x14';
+  src: local('AcPlus_IBM_VGA_8x14'), url(./fonts/AcPlus_IBM_VGA_8x14.ttf) format('truetype');
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
