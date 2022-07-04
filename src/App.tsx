@@ -19,6 +19,9 @@ export function App() {
   const [language, setLanguage] = React.useState('yaml');
   const [controlsShown, setControlsShown] = React.useState(false);
 
+  const [rawFontSizeText, setRawFontSizeText] = React.useState('' + rawFontSize);
+  const [languageText, setLanguageText] = React.useState(language);
+
   React.useEffect(() => {
     document.body.style.backgroundColor = theme === 'retro' ? '#000000' : '#fbfbfb';
   }, [theme]);
@@ -122,9 +125,14 @@ export function App() {
           fontFamily,
           fontSize,
         }}
-        value={rawFontSize}
+        value={rawFontSizeText}
         onChange={(event) => {
-          setRawFontSize(+event.target.value)
+          setRawFontSizeText(event.target.value)
+        }}
+        onKeyDown={(event) => {
+          if (event.code === 'Enter') {
+            setRawFontSize(+rawFontSizeText)
+          }
         }} />
         &nbsp;Language:&nbsp;
         <input style={{
@@ -136,9 +144,14 @@ export function App() {
           fontFamily,
           fontSize,
         }}
-        value={language}
+        value={languageText}
         onChange={(event) => {
-          setLanguage(event.target.value)
+          setLanguageText(event.target.value)
+        }}
+        onKeyDown={(event) => {
+          if (event.code === 'Enter') {
+            setLanguage(languageText)
+          }
         }}/>
         &nbsp;Theme:&nbsp;
         <select style={{
