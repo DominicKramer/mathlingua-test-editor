@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "./static/css/main.e3ef9206.css",
-    "main.js": "./static/js/main.688879de.js",
+    "main.js": "./static/js/main.9fd6916d.js",
     "static/media/AcPlus_IBM_VGA_8x14.ttf": "./static/media/AcPlus_IBM_VGA_8x14.16f7866bb623fc0a5272.ttf",
     "static/media/Ac437_IBM_DOS_ISO9.ttf": "./static/media/Ac437_IBM_DOS_ISO9.edf4dea43adab5243372.ttf",
     "index.html": "./index.html",
     "main.e3ef9206.css.map": "./static/css/main.e3ef9206.css.map",
-    "main.688879de.js.map": "./static/js/main.688879de.js.map"
+    "main.9fd6916d.js.map": "./static/js/main.9fd6916d.js.map"
   },
   "entrypoints": [
     "static/css/main.e3ef9206.css",
-    "static/js/main.688879de.js"
+    "static/js/main.9fd6916d.js"
   ]
 }
