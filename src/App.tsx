@@ -3,41 +3,28 @@ import Editor, { OnMount } from "@monaco-editor/react";
 
 const MATHLINGUA_KEY = 'MATHLINGUA_EDITOR';
 
-const ORANGE = '#ffaa00';
-const DARK_ORANGE = '#dd9900';
+const ORANGE = '#ce9178';
+const DARK_ORANGE = '#ce9178';
 
 const FONTS = [
   'AcPlus_IBM_VGA_8x14',
   'IBM_DOS_ISO9',
-  undefined,
+  'Monospace',
 ];
 
 export function App() {
   const [rawFontSize, setRawFontSize] = React.useState(18);
-  const [light, setLight] = React.useState(true);
-  const [blur, setBlur] = React.useState(true);
-  const [fontIndex, setFontIndex] = React.useState(0);
+  const [theme, setTheme] = React.useState('light');
+  const [fontFamily, setFontFamily] = React.useState(FONTS[0]);
+  const [language, setLanguage] = React.useState('yaml');
+  const [controlsShown, setControlsShown] = React.useState(false);
 
   React.useEffect(() => {
-    document.body.style.backgroundColor = light ? '#fbfbfb' : '#000000'; 
-  }, [light]);
-
-  const setShadow = (node: Node) => {
-    if ((node as any).style) {
-      const style = getComputedStyle(node as any);
-      (node as any).style.textShadow = `1px 1px 6px ${style.color}`;
-    }
-    node.childNodes.forEach(setShadow);
-  }
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      setShadow(document.body);
-    }, 1000);
-  }, [blur]);
+    document.body.style.backgroundColor = theme === 'retro' ? '#000000' : '#fbfbfb';
+  }, [theme]);
 
   const onMount: OnMount = (editor, monaco: any) => {
-    monaco.editor.defineTheme('customTheme', {
+    monaco.editor.defineTheme('retro', {
       base: 'vs-dark',
       inherit: true,
       rules: [{
@@ -57,13 +44,13 @@ export function App() {
     registerSaver(monaco);
     // this is needed to initially use dark mode since the
     // custom theme needs to be defined before dark mode can be used
-    setLight(false);
+    setTheme('retro');
   };
 
-  const usingRetroFont = fontIndex === FONTS.length - 1;
+  const light = theme === 'light';
+  const usingRetroFont = fontFamily !== 'Monospace';
   const foreground = light ? '#555555' : ORANGE;
   const fontSize = usingRetroFont ? rawFontSize + 7 : rawFontSize;
-  const fontFamily = FONTS[fontIndex];
   const buttonStyle = {
     border: 'none',
     background: 'transparent',
@@ -91,43 +78,97 @@ export function App() {
       <button
         style={buttonStyle}
         onClick={() => {
-          setRawFontSize(rawFontSize + 1);
-        }}
-      >
-        +
-      </button>
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          setRawFontSize(Math.max(0, rawFontSize - 1));
-        }}>
-          -
-      </button>
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          setLight(!light);
+          setControlsShown(!controlsShown)
         }}>
           =
       </button>
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          setBlur(!blur);
+      <div style={{
+        color: ORANGE,
+        display: controlsShown ? 'unset' : 'none',
+        fontFamily,
+        fontSize,
+      }}>
+        Font Family:&nbsp;
+        <select style={{
+          border: 'solid',
+          borderWidth: '1px',
+          borderColor: ORANGE,
+          background: '#000000',
+          color: ORANGE,
+          fontFamily,
+          fontSize,
+        }}
+        onChange={(event) => {
+          setFontFamily(event.target.value);
         }}>
-          #
-      </button>
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          setFontIndex((fontIndex + 1) % FONTS.length);
+          {
+            FONTS.map(fontName => (<option style={{
+              background: '#333333',
+              border: 'solid',
+              borderColor: ORANGE,
+              borderWidth: '1px',
+            }}>
+              {fontName ?? 'default'}
+            </option>))
+          }
+        </select>
+        &nbsp;Font size:&nbsp;
+        <input style={{
+          background: '#000000',
+          borderWidth: '1px',
+          borderColor: ORANGE,
+          color: ORANGE,
+          width: '2em',
+          fontFamily,
+          fontSize,
+        }}
+        value={rawFontSize}
+        onChange={(event) => {
+          setRawFontSize(+event.target.value)
+        }} />
+        &nbsp;Language:&nbsp;
+        <input style={{
+          background: '#000000',
+          borderWidth: '1px',
+          borderColor: ORANGE,
+          color: ORANGE,
+          width: '2em',
+          fontFamily,
+          fontSize,
+        }}
+        value={language}
+        onChange={(event) => {
+          setLanguage(event.target.value)
+        }}/>
+        &nbsp;Theme:&nbsp;
+        <select style={{
+          border: 'solid',
+          borderWidth: '1px',
+          borderColor: ORANGE,
+          background: '#000000',
+          color: ORANGE,
+          fontFamily,
+          fontSize,
+        }}
+        onChange={(event) => {
+          setTheme(event.target.value);
         }}>
-          {usingRetroFont ? '*' : '@'}
-      </button>
+          {
+            ['light', 'retro'].map(theme => (<option style={{
+              background: '#333333',
+              border: 'solid',
+              borderColor: ORANGE,
+              borderWidth: '1px',
+            }}>
+              {theme}
+            </option>))
+          }
+        </select>
+      </div>
       <Editor
         height='92vh'
-        defaultLanguage='yaml'
-        theme={light ? 'light' : 'customTheme'}
+        language={language}
+        theme={light ? 'light' : 'retro'}
         options={{
           lineNumbers: 'off',
           autoClosingBrackets: 'never',
@@ -148,7 +189,6 @@ export function App() {
         }}
         value={localStorage.getItem(MATHLINGUA_KEY) ?? ''}
         onMount={onMount}
-        onChange={() => setShadow(document.body)}
       />
     </div>
   </div>;
